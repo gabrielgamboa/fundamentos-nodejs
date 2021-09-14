@@ -112,4 +112,37 @@ app.get('/statement/date', verifyIfExistsAccountCPF, (request,response) => {
     return response.json(statement);
 });
 
+//atualizar uma conta pelo cpf
+app.put('/account', verifyIfExistsAccountCPF, (request, response) => {
+    const { name } = request.body;
+    const { customer } = request;
+
+    customer.name = name;
+
+    return response.status(201).send();
+});
+
+//trazer uma conta pelo cpf
+app.get('/account', verifyIfExistsAccountCPF, (request, response) => {
+    const { customer } = request;
+    return response.json(customer);
+});
+
+//deletar uma conta pelo cpf e retornar a lista
+app.delete('/account', verifyIfExistsAccountCPF, (request, response) => {
+    const {customer} = request;
+    const indexAccount = customers.indexOf(customer);
+    
+    customers.splice(indexAccount, 1);
+
+    return response.json(customers);
+});
+
+//retornar o saldo do cliente pelo cpf
+app.get('/balance', verifyIfExistsAccountCPF, (request, response) => {
+    const {customer} = request;
+    const balance = getBalance(customer.statement);
+    return response.json(balance);
+});
+
 app.listen(3333, () => console.log('Server is running on port 3333'));
