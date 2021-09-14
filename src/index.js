@@ -15,7 +15,7 @@ function verifyIfExistsAccountCPF(request, response, next) {
 
     if (customer) {
         request.customer = customer;
-        next();
+        return next();
     }
 
     return response.status(400).json({error: 'Customer not found.'})
@@ -85,7 +85,7 @@ app.post('/withdraw', verifyIfExistsAccountCPF, (request, response) => {
     const balance = getBalance(customer.statement);
 
     if (balance < amount) {
-        return response.json({error: 'Você não possui saldo suficiente para realizar saque!'});
+        return response.json({error: 'Você não possui saldo suficiente para realizar saque.'});
     }
 
     const newStatementOperation = {
@@ -97,6 +97,19 @@ app.post('/withdraw', verifyIfExistsAccountCPF, (request, response) => {
     customer.statement.push(newStatementOperation);
 
     return response.status(201).send();
+});
+
+//mostrar extrato de um cliente através do cpf , por data
+app.get('/statement/date', verifyIfExistsAccountCPF, (request,response) => {
+    const { customer } = request;
+    const { date } = request.query;
+
+    const dateFormat = new Date(date + " 00:00");
+    console.log(dateFormat);
+
+    const statement = customer.statement.filter(statement => statement.created_at.toDateString() === new Date(dateFormat).toDateString());
+    
+    return response.json(statement);
 });
 
 app.listen(3333, () => console.log('Server is running on port 3333'));
