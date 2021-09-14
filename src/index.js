@@ -13,6 +13,12 @@ app.post("/account", (request, response) => {
     const {cpf, name} = request.body;
     const uuid = uuidv4();
 
+    const consumerAlreadyExists = consumers.some(consumer => consumer.cpf === cpf);
+
+    if (consumerAlreadyExists) {
+        return response.status(400).json({error: "CPF informado já existe!"});
+    }
+
     consumers.push({
         cpf,
         name,
